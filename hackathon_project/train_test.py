@@ -5,8 +5,7 @@ from hackathon_project.f1_score import f1score
 from torch.nn import functional as F
 
 
-def train_test(EPOCHS=None, model=None, train_dataloader=None, test_dataloader=None, optimizer=None, log_interval=None,
-          max_grad_norm=None, scheduler=None):
+def train_test(EPOCHS=None, model=None, train_dataloader=None, test_dataloader=None, optimizer=None, log_interval=None):
     for e_idx, epoch in enumerate(range(EPOCHS)):
         losses = list()
 
@@ -18,9 +17,7 @@ def train_test(EPOCHS=None, model=None, train_dataloader=None, test_dataloader=N
             y_hat = model.predict(X)
             optimizer.zero_grad()  # resetting the gradients.
             loss.backward(retain_graph=True)  # backprop the loss
-            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
             optimizer.step()  # gradient step
-            # scheduler.step()
             y_hat = F.softmax(y_hat, dim=1)
             train_f1 = f1score(y, y_hat)
             losses.append(loss.item())
