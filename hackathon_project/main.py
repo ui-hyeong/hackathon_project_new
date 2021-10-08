@@ -11,10 +11,7 @@ from hackathon_project.EMOClassifer import EMOClassifer
 from hackathon_project.Builder import Build_X, Build_y
 from hackathon_project.SimpleDataset import SimpleDataset
 from hackathon_project.train_test import train_test
-from transformers.optimization import get_cosine_schedule_with_warmup
-
-
-
+from transformers.optimization import get_cosine_schedule_with_warmup, AdamW
 
 # device = torch.device("cuda:0")
 
@@ -29,16 +26,19 @@ def main():
 
     test_size = 0.3
     random_state = 13
-    batch_size = 27
-    EPOCHS = 1
+    batch_size = 64
+    EPOCHS = 10
+    learning_rate = 5e-5
+    num_class = 3
+    max_grad_norm = 1
+    warmup_ratio = 0.1
     log_interval = 200
-    learning_rate = 6e-6
-    num_class = 6
 
     USE_CUDA = torch.cuda.is_available()
     print(USE_CUDA)
 
-    device = torch.device("cpu")
+    # device = torch.device('cuda:0' if USE_CUDA else 'cpu')
+    device = torch.device('cpu')
     print('학습을 진행하는 기기:', device)
     bertmodel = AutoModel.from_pretrained("monologg/kobert")
     tokenizer = AutoTokenizer.from_pretrained("monologg/kobert")
@@ -57,6 +57,7 @@ def main():
 
 
 
+
     train_dataset = SimpleDataset(x_train, y_train)
     test_dataset = SimpleDataset(x_test, y_test)
     train_dataloader = DataLoader(dataset=train_dataset,
@@ -67,18 +68,31 @@ def main():
                                  shuffle=True)
 
     classfer = EMOClassifer(bertmodel, num_class=num_class, device=device)
+    no_decay = ['bias', 'LayerNorm.weight']
+    optimizer_grouped_parameters = [
+        {'params': [p for n, p in classfer.named_parameters() if not any(nd in n for nd in no_decay)],
+         'weight_decay': 0.01},
+        {'params': [p for n, p in classfer.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+    ]
+    optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
+    # optimizer = torch.optim.Adam(classfer.parameters(), lr=learning_rate)
 
-    optimizer = torch.optim.Adam(params=classfer.parameters(), lr=learning_rate)
+    t_total = len(train_dataloader) * EPOCHS
+    warmup_step = int(t_total * warmup_ratio)
 
+    scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=warmup_step, num_training_steps=t_total)
 
     #------------------------------ train & test ---------------------------------
+    print('학습시작')
+    train_test(train_dataloader=train_dataloader,
+               test_dataloader=test_dataloader,
+               model=classfer,
+               EPOCHS=EPOCHS,
+               optimizer=optimizer,
+               max_grad_norm=max_grad_norm,
+               scheduler=scheduler,
+               log_interval=log_interval)
 
-    train_test(train_dataloader = train_dataloader,
-               test_dataloader = test_dataloader,
-               model = classfer,
-               EPOCHS = EPOCHS,
-               optimizer = optimizer,
-               log_interval = log_interval)
 
 if __name__ == '__main__':
     main()
