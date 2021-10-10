@@ -29,7 +29,7 @@ def main():
     batch_size = 64
     EPOCHS = 10
     learning_rate = 5e-5
-    num_class = 3
+    num_class = 6
     max_grad_norm = 1
     warmup_ratio = 0.1
     log_interval = 200
