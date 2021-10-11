@@ -3,7 +3,7 @@ from torch.nn import functional as F
 from transformers import BertModel
 
 
-class emoClassifer(torch.nn.Module):
+class similar_Classifer(torch.nn.Module):
     def __init__(self, bert: BertModel, num_class: int, device: torch.device):
         super().__init__()
         self.bert = bert
