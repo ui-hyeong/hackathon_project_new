@@ -7,7 +7,7 @@ from torch import optim
 from transformers import AutoTokenizer, AutoModel
 from torch.utils.data import DataLoader
 
-from hackathon_project.EMOClassifer import EMOClassifer
+from hackathon_project.EMOClassifer import emoClassifer
 from hackathon_project.Builder import Build_X, Build_y
 from hackathon_project.SimpleDataset import SimpleDataset
 from hackathon_project.train_test import train_test
@@ -67,7 +67,7 @@ def main():
                                  batch_size=batch_size,
                                  shuffle=True)
 
-    classfer = EMOClassifer(bertmodel, num_class=num_class, device=device)
+    classfer = emoClassifer(bertmodel, num_class=num_class, device=device)
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
         {'params': [p for n, p in classfer.named_parameters() if not any(nd in n for nd in no_decay)],

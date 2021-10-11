@@ -63,8 +63,9 @@ def Build_X (sents, tokenizer, device):
 
 def predict(DATA):
     bertmodel = BertModel.from_pretrained("beomi/kcbert-base")
+    torch.save(bertmodel, 'kcbertmodel.pth')
     tokenizer = BertTokenizer.from_pretrained("beomi/kcbert-base")
-
+    torch.save(tokenizer, 'kcbert_tokenizer.pth')
     device = torch.device('cuda:0')
     model = torch.load(r'C:\Users\jeonguihyeong\PycharmProjects\hackathon_project\emoclassfer_2\epoch20.pth', map_location=device)
     # model.eval()
