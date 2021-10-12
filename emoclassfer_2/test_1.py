@@ -63,9 +63,7 @@ def Build_X (sents, tokenizer, device):
 
 def predict(DATA):
     bertmodel = BertModel.from_pretrained("beomi/kcbert-base")
-    torch.save(bertmodel, 'kcbertmodel.pth')
     tokenizer = BertTokenizer.from_pretrained("beomi/kcbert-base")
-    torch.save(tokenizer, 'kcbert_tokenizer.pth')
     device = torch.device('cuda:0')
     model = torch.load(r'C:\Users\jeonguihyeong\PycharmProjects\hackathon_project\emoclassfer_2\epoch20.pth', map_location=device)
     # model.eval()
@@ -75,7 +73,7 @@ def predict(DATA):
     y_hat = F.softmax(y_hat, dim=1)
 
     return y_hat
-print(predict('선생님이 나를 혼냈어'))
+print(predict('여기 커피 완전 별로였어'))
 
 #
 # 기쁨 0

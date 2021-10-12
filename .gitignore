@@ -1,3 +1,4 @@
 /similar_text/train.csv
 *.csv
 *.pth
+*.csv
