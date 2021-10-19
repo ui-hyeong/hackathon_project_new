@@ -3,6 +3,7 @@ from typing import List
 import torch
 
 
+# tokenizer를 통해 텍스트 데이터를 인코딩된 input_ids, 토큰의 타입, attention_masking이 된 데이터로 변환시켜줌
 def Build_X (sents, tokenizer, device):
     X = tokenizer(sents, padding=True, truncation=True, return_tensors='pt')
     return torch.stack([
